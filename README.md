@@ -1,0 +1,2 @@
+# BOBOLE-BOT
+Bot Discord
