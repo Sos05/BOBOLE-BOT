@@ -1,0 +1,9 @@
+{
+  "token": "BOT_TOKEN",
+  "clientId": "BOT_ID",
+  "weatherApiKey": "WEATHER_API_KEY",
+  "geminiApiKey":"GEMINI_API_KEY",
+  "status": {
+    "status": "online"
+  }
+}
