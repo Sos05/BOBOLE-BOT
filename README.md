@@ -33,7 +33,7 @@ Discord Bot Documentation
 
 4. **Run the Bot**  
    ```bash
-   node index.js
+   npm start
    ```
 
 ## 🛠️ Available Commands
