@@ -54,14 +54,14 @@ Discord Bot Documentation
 
 ### 🧰 Utilities
 - [X] banner.js → Show a user’s banner  
-- [X] fake.js → Generate fake data  
+- [X] fake.js → Fake user troll  
 - [X] meteo.js → Get weather info  
 - [X] news.js → Show latest news  
 - [X] ping.js → Check bot latency  
 - [X] pp.js → Show a user’s profile picture  
 - [X] selfdeco.js → Self disconnect from voice channel  
 - [X] serverinfo.js → Show server information  
-- [X] tts.js → Convert text to speech  
+- [X] tts.js → Convert text to speech in a voice channel 
 - [X] userinfo.js → Show user information  
 
 ---
