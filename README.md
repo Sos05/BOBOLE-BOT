@@ -19,7 +19,7 @@ Discord Bot Documentation
      ```
 
 3. **Configure API Keys**  
-   - Open your configuration file (e.g., `config.json`).  
+   - Open your configuration file (`config.json`).  
    - Add your keys:  
      ```json
      {
