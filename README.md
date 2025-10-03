@@ -20,7 +20,7 @@ Discord Bot Documentation
 
 3. **Configure API Keys**  
    - Open your configuration file (`config.json`).  
-   - Add your bot token, application ID, and API keys:  
+   - Replace the lines below with your bot token, application ID, and API keys:  
      ```json
       "YOUR_DISCORD_BOT_TOKEN"
       "YOUR_APPLICATION_ID"
