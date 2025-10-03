@@ -37,31 +37,32 @@ Discord Bot Documentation
 ## 🛠️ Available Commands
 
 ### 🔑 Admin
-[X] ban.js → Ban a member  
-[X] clear.js → Clear messages in a channel  
-[X] clearuser.js → Clear messages from a specific user  
-[X] kick.js → Kick a member  
-[X] mpall.js → Send a DM to all members  
-[X] mute.js → Mute a member  
-[X] unban.js → Unban a user  
-[X] unmute.js → Unmute a member  
+- [X] ban.js → Ban a member  
+- [X] clear.js → Clear messages in a channel  
+- [X] clearuser.js → Clear messages from a specific user  
+- [X] kick.js → Kick a member  
+- [X] mpall.js → Send a DM to all members  
+- [X] mute.js → Mute a member  
+- [X] unban.js → Unban a user  
+- [X] unmute.js → Unmute a member  
 
 ### 🤖 AI
-[X] ask.js → Ask the AI a question  
+- [X] ask.js → Ask the AI a question  
 
 ### 🎶 Radio
-[X] radio.js → Play radio  
+- [X] radio.js → Play radio
+
 ### 🧰 Utilities
-[X] banner.js → Show a user’s banner  
-[X] fake.js → Generate fake data  
-[X] meteo.js → Get weather info  
-[X] news.js → Show latest news  
-[X] ping.js → Check bot latency  
-[X] pp.js → Show a user’s profile picture  
-[X] selfdeco.js → Self disconnect from voice channel  
-[X] serverinfo.js → Show server information  
-[X] tts.js → Convert text to speech  
-[X] userinfo.js → Show user information  
+- [X] banner.js → Show a user’s banner  
+- [X] fake.js → Generate fake data  
+- [X] meteo.js → Get weather info  
+- [X] news.js → Show latest news  
+- [X] ping.js → Check bot latency  
+- [X] pp.js → Show a user’s profile picture  
+- [X] selfdeco.js → Self disconnect from voice channel  
+- [X] serverinfo.js → Show server information  
+- [X] tts.js → Convert text to speech  
+- [X] userinfo.js → Show user information  
 
 ---
 
