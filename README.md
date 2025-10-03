@@ -22,13 +22,11 @@ Discord Bot Documentation
    - Open your configuration file (`config.json`).  
    - Add your keys:  
      ```json
-     {
-       "token": "YOUR_DISCORD_BOT_TOKEN",
-       "appId": "YOUR_APPLICATION_ID",
-       "weatherApiKey": "WEATHER_API_KEY",
-       "geminiApiKey": "GEMINI_API_KEY",
-       "newsApiKey": "NEWS_API_KEY"
-     }
+      "YOUR_DISCORD_BOT_TOKEN"
+      "YOUR_APPLICATION_ID"
+      "WEATHER_API_KEY"
+      "GEMINI_API_KEY"
+      "NEWS_API_KEY"
      ```
 
 4. **Run the Bot**  
