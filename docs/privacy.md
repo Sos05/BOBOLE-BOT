@@ -1,3 +1,8 @@
+---
+layout: default
+title: Politique de confidentialité
+---
+
 # Politique de confidentialité de BOBOLE-BOT
 
 ## Données collectées
