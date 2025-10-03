@@ -1,8 +1,3 @@
----
-layout: default
-title: Politique de confidentialité
----
-
 # Politique de confidentialité de BOBOLE-BOT
 
 ## Données collectées
@@ -24,3 +19,4 @@ Cette politique peut être mise à jour ; les utilisateurs seront informés via 
 
 ## Contact
 Pour toute question sur la politique de confidentialité, utiliser ce discord : **soso5_** .
+
