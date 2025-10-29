@@ -3,6 +3,13 @@ Discord Bot Documentation
 
 ---
 
+## 📜 Legal
+
+- [Privacy Policy](./docs/PRIVACY.md)  
+- [Terms of Service](./docs/TERMS.md)
+
+---
+
 ## 📌 How to Setup the Bot
 
 1. **Create a Discord Application**  
