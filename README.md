@@ -5,8 +5,8 @@ Discord Bot Documentation
 
 ## 📜 Legal
 
-- [Privacy Policy](./docs/PRIVACY.md)  
-- [Terms of Service](./docs/TERMS.md)
+- [Privacy Policy](https://Sos05.github.io/BOBOLE-BOT/privacy)  
+- [Terms of Service](https://Sos05.github.io/BOBOLE-BOT/terms)
 
 ---
 
