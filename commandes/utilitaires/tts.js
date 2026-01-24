@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, MessageFlags } = require('discord.js');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, getVoiceConnection } = require('@discordjs/voice');
-const gTTS = require('gtts');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, getVoiceConnection, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
+const googleTTS = require('google-tts-api');
+
+const disconnectTimers = new Map();
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,42 +10,92 @@ module.exports = {
         .setDescription('Dit un message dans un salon vocal.')
         .addStringOption(option =>
             option.setName('message')
-                .setDescription('Le message à dire.')
+                .setDescription('Le message à dire (max 200 caractères).')
                 .setRequired(true)
+                .setMaxLength(200)
         ),
     async execute(interaction) {
-        const voiceChannel = interaction.member.voice.channel;
-        const guild = interaction.guild;
-        const client = interaction.client;
+        const { channel } = interaction.member.voice;
 
-        if (!voiceChannel) {
-            return interaction.reply({ content: '❌ Vous devez être dans un salon vocal pour utiliser cette commande.', flags: [MessageFlags.Ephemeral] });
+        if (!channel) {
+            return interaction.reply({
+                content: '❌ Vous devez être dans un salon vocal.',
+                flags: [MessageFlags.Ephemeral]
+            });
         }
 
         const messageToSpeak = interaction.options.getString('message');
+        const guildId = interaction.guild.id;
 
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
-        const connection = getVoiceConnection(guild.id) || joinVoiceChannel({
-            channelId: voiceChannel.id,
-            guildId: guild.id,
-            adapterCreator: guild.voiceAdapterCreator,
-        });
-
-        const player = createAudioPlayer();
-        connection.subscribe(player);
-
         try {
-            const gtts = new gTTS(messageToSpeak, 'fr');
-            const readableStream = gtts.stream();
-            
-            const resource = createAudioResource(readableStream);
+            const audioUrl = googleTTS.getAudioUrl(messageToSpeak, {
+                lang: 'fr',
+                slow: false,
+                host: 'https://translate.google.com',
+            });
+
+            let connection = getVoiceConnection(guildId);
+
+            if (!connection) {
+                connection = joinVoiceChannel({
+                    channelId: channel.id,
+                    guildId: guildId,
+                    adapterCreator: interaction.guild.voiceAdapterCreator,
+                });
+            }
+
+            if (disconnectTimers.has(guildId)) {
+                clearTimeout(disconnectTimers.get(guildId));
+            }
+
+            await new Promise((resolve, reject) => {
+                if (connection.state.status === VoiceConnectionStatus.Ready) {
+                    resolve();
+                } else {
+                    connection.once(VoiceConnectionStatus.Ready, resolve);
+                    connection.once(VoiceConnectionStatus.Disconnected, reject);
+                    connection.once(VoiceConnectionStatus.Destroyed, reject);
+                    setTimeout(() => reject(new Error('Timeout connexion')), 10000);
+                }
+            });
+
+            const player = createAudioPlayer();
+            const resource = createAudioResource(audioUrl);
+
+            player.on(AudioPlayerStatus.Idle, () => {
+                const timer = setTimeout(() => {
+                    const conn = getVoiceConnection(guildId);
+                    if (conn) {
+                        conn.destroy();
+                        disconnectTimers.delete(guildId);
+                    }
+                }, 600000);
+
+                disconnectTimers.set(guildId, timer);
+            });
+
+            player.on('error', error => {
+                console.error('Erreur player:', error);
+            });
+
+            connection.subscribe(player);
             player.play(resource);
 
-            await interaction.editReply({ content: `✅ En train de dire : "${messageToSpeak}" dans le salon ${voiceChannel.name}.` });
+            await interaction.editReply({ content: `🗣️ **Dit :** "${messageToSpeak}"` });
+
         } catch (error) {
-            console.error('❌ Erreur lors du TTS :', error);
-            await interaction.editReply({ content: '❌ Une erreur est survenue lors de la lecture du message.' });
+            console.error('Erreur TTS:', error);
+
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ content: '❌ Erreur lors de la synthèse vocale.' });
+            } else {
+                await interaction.reply({
+                    content: '❌ Erreur lors de la synthèse vocale.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
         }
     },
 };
