@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, getVoiceConnection } = require('@discordjs/voice');
-const { AudioPlayerStatus } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, getVoiceConnection, AudioPlayerStatus } = require('@discordjs/voice');
 
 const radioStations = [
     { label: 'Lofi', description: 'Radio Lofi pour se détendre et étudier.', value: 'http://usa9.fastcast4u.com/proxy/jamz', emoji: '🎧' },
@@ -38,13 +37,13 @@ module.exports = {
         const guild = interaction.guild;
         const client = interaction.client;
         const voiceChannel = interaction.member.voice.channel;
-        
+
         if (interaction.isCommand()) {
             const embed = new EmbedBuilder()
                 .setTitle('📻 Radio du serveur')
                 .setDescription('Sélectionnez une station dans le menu ci-dessous pour commencer à écouter.')
                 .setColor('#3498db')
-                .setImage('https://media.discordapp.net/attachments/1258169145145888820/1267862024982630472/standard.gif?ex=66aa0817&is=66a8b697&hm=55df852c002c9fc2d7f872173f004a6c42a2202685950117498c0b396a56e759&=&width=560&height=121');
+                .setImage('https://media.discordapp.net/attachments/1258169145145888820/1267862024982630472/standard.gif');
 
             await interaction.reply({ embeds: [embed], components: [createSelectMenu()], flags: [MessageFlags.Ephemeral] });
             return;
@@ -57,11 +56,13 @@ module.exports = {
 
             const selectedRadioUrl = interaction.values[0];
             const selectedRadio = radioStations.find(r => r.value === selectedRadioUrl);
-            
+
             await interaction.deferUpdate();
 
-            // J'ai retiré le clearTimeout et le delete du client.timeouts ici
-            // car la gestion est maintenant globale dans index.js
+            if (client.timeouts && client.timeouts.has(guild.id)) {
+                clearTimeout(client.timeouts.get(guild.id));
+                client.timeouts.delete(guild.id);
+            }
 
             try {
                 const connection = getVoiceConnection(guild.id) || joinVoiceChannel({
@@ -69,44 +70,59 @@ module.exports = {
                     guildId: guild.id,
                     adapterCreator: guild.voiceAdapterCreator,
                     selfDeaf: true,
+                    group: 'default'
                 });
 
                 const player = createAudioPlayer();
+
+                player.on('stateChange', (oldState, newState) => {
+                    console.log(`État radio : ${oldState.status} -> ${newState.status}`);
+                });
+
+                player.on('error', error => {
+                    console.error('Erreur radio:', error);
+                });
+
                 const resource = createAudioResource(selectedRadioUrl);
                 connection.subscribe(player);
                 player.play(resource);
 
-                player.on('error', console.error);
-
-                // J'ai retiré le player.on(AudioPlayerStatus.Idle, ...)
-                // car la gestion est maintenant globale dans index.js
+                player.on(AudioPlayerStatus.Idle, () => {
+                    const timeout = setTimeout(() => {
+                        if (connection) connection.destroy();
+                    }, 300000);
+                    if (!client.timeouts) client.timeouts = new Map();
+                    client.timeouts.set(guild.id, timeout);
+                });
 
                 const embed = new EmbedBuilder()
                     .setTitle(`${selectedRadio.emoji} En cours : ${selectedRadio.label}`)
                     .setDescription(`*${selectedRadio.description}*\n\nBonne écoute !`)
                     .setColor('#2ecc71');
-                
+
                 const row = new ActionRowBuilder().addComponents(
                     new ButtonBuilder().setCustomId('radio_stop').setLabel('Arrêter').setStyle(ButtonStyle.Danger),
                     new ButtonBuilder().setCustomId('radio_change').setLabel('Changer de radio').setStyle(ButtonStyle.Primary)
                 );
 
-                await interaction.followUp({ embeds: [embed], components: [row] });
+                await interaction.followUp({ embeds: [embed], components: [row], flags: [MessageFlags.Ephemeral] });
             } catch (error) {
                 console.error(error);
                 await interaction.followUp({ content: '❌ Une erreur est survenue lors de la connexion.', flags: [MessageFlags.Ephemeral] });
             }
         }
-        
+
         if (interaction.isButton()) {
-            await interaction.deferUpdate(); 
+            await interaction.deferUpdate();
 
             if (interaction.customId === 'radio_stop') {
                 const connection = getVoiceConnection(guild.id);
                 if (connection) {
                     connection.destroy();
-                    // J'ai retiré le clearTimeout et le delete du client.timeouts ici
-                    // car la gestion est maintenant globale dans index.js
+                    if (client.timeouts && client.timeouts.has(guild.id)) {
+                        clearTimeout(client.timeouts.get(guild.id));
+                        client.timeouts.delete(guild.id);
+                    }
                 }
 
                 const stopEmbed = new EmbedBuilder()
@@ -114,8 +130,8 @@ module.exports = {
                     .setDescription(`La session radio a été terminée par ${interaction.user}.`)
                     .setColor('#e74c3c')
                     .setTimestamp();
-                
-                await interaction.followUp({ embeds: [stopEmbed], components: [] });
+
+                await interaction.followUp({ embeds: [stopEmbed], components: [], flags: [MessageFlags.Ephemeral] });
             } else if (interaction.customId === 'radio_change') {
                 const embed = new EmbedBuilder()
                     .setTitle('📻 Choisissez votre nouvelle radio')
