@@ -1,4 +1,6 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require('discord.js');
+const path = require('path');
+const fs = require('fs');
 
 const lyrics = [
     ["Dans l'étang calme où tout sommeille", "Une statue qui émerveille"],
@@ -14,31 +16,35 @@ const lyrics = [
     ["Tu ne ris pas mais fais marrer", "Un drôle de moine"],
 ];
 
-const boboles = [
-    'https://media1.tenor.com/m/NUhGG3PhYgEAAAAd/bobole-moine.gif',
-    'https://media1.tenor.com/m/87qKUd5B2tgAAAAd/bobole-moine-moine-de-boedic.gif',
-    "https://i.ibb.co/60ZM6F1X/bust.png",
-    "https://i.ibb.co/TxcxrF0f/donkey-kong.png",
-    "https://i.ibb.co/wNsp8L62/IMG-20250716-235234.jpg",
-    "https://i.ibb.co/Y4wkX70J/skeleton.png",
-];
-
 const randomPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-export const data = new SlashCommandBuilder()
-    .setName('bobole')
-    .setDescription('Envoie une bobolerie');
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('bobole')
+        .setDescription('Envoie une bobolerie'),
 
-export async function execute(interaction) {
-    const [line1, line2] = randomPick(lyrics);
+    async execute(interaction) {
+        const imagesDir = path.join(__dirname, '/images');
 
-    const embed = new EmbedBuilder()
-        .setColor(0x6BD8FF)
-        .setTitle('✨ Bobolerie ✨')
-        .setDescription(`> 🎶🎤 *${line1}* 🎶🎤\n 🎶🎤 *${line2}* 🎶🎤`)
-        .setImage(randomPick(boboles))
-        .setFooter({ text: 'Statue posée sous mille cieux..' })
-        .setTimestamp();
+        const files = fs.readdirSync(imagesDir);
+        const selectedFile = randomPick(files);
 
-    await interaction.reply({ embeds: [embed] });
-}
+        const filePath = path.join(imagesDir, selectedFile);
+        const attachment = new AttachmentBuilder(filePath, { name: selectedFile });
+
+        const [line1, line2] = randomPick(lyrics);
+
+        const embed = new EmbedBuilder()
+            .setColor(0x6BD8FF)
+            .setTitle('✨ Bobolerie ✨')
+            .setDescription(`> 🎶🎤 *${line1}* 🎶🎤\n> 🎶🎤 *${line2}* 🎶🎤`)
+            .setImage(`attachment://${selectedFile}`)
+            .setFooter({ text: 'Statue posée sous mille cieux..' })
+            .setTimestamp();
+
+        await interaction.reply({
+            embeds: [embed],
+            files: [attachment]
+        });
+    }
+};
