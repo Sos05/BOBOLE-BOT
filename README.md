@@ -59,6 +59,9 @@ Discord Bot Documentation
 ### 🎶 Radio
 - [X] radio.js → Play radio
 
+### 🎪 Fun
+- [X] bobole.js → Show random pictures in a folder
+
 ### 🧰 Utilities
 - [X] banner.js → Show a user’s banner  
 - [X] fake.js → Fake user troll  
