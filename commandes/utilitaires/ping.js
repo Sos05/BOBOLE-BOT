@@ -26,6 +26,10 @@ module.exports = {
             .setDescription(`La latence du bot est de **${botLatency} ms**.`)
             .setFooter({ text: `État de la connexion : ${health}` });
 
-        await interaction.reply({ embeds: [pingEmbed] });
+        try {
+            await interaction.reply({ embeds: [pingEmbed] });
+        } catch (error) {
+            console.error('Impossible d\'envoyer le message de ping (Interaction expirée ou invalide) :', error.message);
+        }
     },
 };
